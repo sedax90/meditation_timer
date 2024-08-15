@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
+import 'package:meditation_timer/widgets/settings.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
-  void _onSettingsTap() {
-    // TODO
+  void _onSettingsTap(context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return const Wrap(
+          children: [
+            Settings(),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20, left: 40, right: 40),
+      padding: const EdgeInsets.only(top: 20, left: 30, right: 30),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -33,7 +44,7 @@ class HomeHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                     IconButton(
-                      onPressed: _onSettingsTap,
+                      onPressed: () => _onSettingsTap(context),
                       icon: const Icon(
                         Icons.settings_outlined,
                         color: AppColors.green,

@@ -9,11 +9,11 @@ import 'package:meditation_timer/utils/timer_utils.dart';
 import 'package:meditation_timer/widgets/time_selector.dart';
 
 class CircularTimer extends StatefulWidget {
-  final Function() onTimerEnd;
+  final Function() onFinish;
 
   const CircularTimer({
     super.key,
-    required this.onTimerEnd,
+    required this.onFinish,
   });
 
   @override
@@ -21,9 +21,8 @@ class CircularTimer extends StatefulWidget {
 }
 
 class _CircularTimerState extends State<CircularTimer> {
-  int seconds = 10;
-  int remainingSeconds = 10;
-  final double percentage = 10;
+  int seconds = 1;
+  int remainingSeconds = 1;
   Timer? timer;
   bool isActive = false;
 
@@ -49,6 +48,7 @@ class _CircularTimerState extends State<CircularTimer> {
     timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (remainingSeconds == 0) {
         timer.cancel();
+        widget.onFinish();
         resetTimer();
       } else {
         setState(() {
@@ -78,6 +78,10 @@ class _CircularTimerState extends State<CircularTimer> {
   }
 
   void openTimerSelection() {
+    if (_timerIsRunning()) {
+      return;
+    }
+
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -85,13 +89,63 @@ class _CircularTimerState extends State<CircularTimer> {
           return Wrap(
             children: [
               TimeSelector(
-                onTimeSet: (time) {
-                  // TODO
+                currentSeconds: seconds,
+                onTimeSet: (timeSec) {
+                  setState(() {
+                    seconds = timeSec;
+                    remainingSeconds = timeSec;
+                  });
                 },
               ),
             ],
           );
         });
+  }
+
+  bool _timerIsRunning() {
+    return isActive || remainingSeconds < seconds;
+  }
+
+  Widget _buildRunningTimerControls() {
+    final stopControl = GestureDetector(
+      onTap: resetTimer,
+      child: SvgPicture.asset(
+        "assets/images/stop.svg",
+        height: 36,
+      ),
+    );
+
+    if (isActive) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          stopControl,
+          const SizedBox(width: 25),
+          GestureDetector(
+            onTap: pauseTimer,
+            child: SvgPicture.asset(
+              "assets/images/pause.svg",
+              height: 36,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          stopControl,
+          const SizedBox(width: 25),
+          GestureDetector(
+            onTap: startTimer,
+            child: SvgPicture.asset(
+              "assets/images/play.svg",
+              height: 36,
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   @override
@@ -168,32 +222,13 @@ class _CircularTimerState extends State<CircularTimer> {
                     ),
                     Container(
                       margin: const EdgeInsets.only(top: 20),
-                      child: isActive
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: resetTimer,
-                                  child: SvgPicture.asset(
-                                    "assets/images/stop.svg",
-                                    height: 42,
-                                  ),
-                                ),
-                                const SizedBox(width: 25),
-                                GestureDetector(
-                                  onTap: pauseTimer,
-                                  child: SvgPicture.asset(
-                                    "assets/images/pause.svg",
-                                    height: 42,
-                                  ),
-                                ),
-                              ],
-                            )
+                      child: _timerIsRunning()
+                          ? _buildRunningTimerControls()
                           : GestureDetector(
                               onTap: startTimer,
                               child: SvgPicture.asset(
                                 "assets/images/play.svg",
-                                height: 42,
+                                height: 36,
                               ),
                             ),
                     ),

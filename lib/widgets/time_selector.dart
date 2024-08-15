@@ -1,19 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
 
 class TimeSelector extends StatefulWidget {
-  final Function(int time) onTimeSet;
+  final Function(int timeSec) onTimeSet;
+  final int currentSeconds;
 
-  const TimeSelector({super.key, required this.onTimeSet});
+  const TimeSelector({
+    super.key,
+    required this.onTimeSet,
+    this.currentSeconds = 420,
+  });
 
   @override
   State<StatefulWidget> createState() => _TimeSelectorState();
 }
 
 class _TimeSelectorState extends State<TimeSelector> {
-  List<int> items = [5, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 70, 80, 90];
+  List<int> items = Iterable<int>.generate(90).toList()..removeRange(0, 5);
   int activePage = 0;
+  final PageController _pageController = PageController(
+    viewportFraction: 0.40,
+    initialPage: 0,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final defaultValue = (widget.currentSeconds ~/ 60);
+      final initialPage = items.indexWhere((e) {
+        return e == defaultValue;
+      });
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(initialPage);
+      }
+    });
+  }
+
+  void _onCancelTap() {
+    Navigator.pop(context);
+  }
+
+  void _onSetTap() {
+    Navigator.pop(context);
+    widget.onTimeSet(items[activePage] * 60);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +75,7 @@ class _TimeSelectorState extends State<TimeSelector> {
                       constraints: const BoxConstraints(maxHeight: 110),
                       child: PageView.builder(
                           itemCount: items.length,
-                          controller: PageController(
-                            viewportFraction: 0.40,
-                            initialPage: 0,
-                          ),
+                          controller: _pageController,
                           physics: const PageScrollPhysics(),
                           onPageChanged: (page) {
                             setState(() {
@@ -82,7 +111,32 @@ class _TimeSelectorState extends State<TimeSelector> {
                     ),
                     const Text(
                       "Minutes",
-                      style: TextStyle(fontSize: 24, fontFamily: AppFonts.secondary),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontFamily: AppFonts.secondary,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: _onCancelTap,
+                              child: Text("Cancel"),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: _onSetTap,
+                              child: Text("Set"),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

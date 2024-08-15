@@ -1,10 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:meditation_timer/screens/widgets/circular_timer.dart';
 import 'package:meditation_timer/screens/widgets/home_header.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late final AudioPlayer player;
+
+  @override
+  initState() {
+    super.initState();
+    player = AudioPlayer();
+  }
+
+  @override
+  dispose() async {
+    super.dispose();
+
+    if (player.playing) {
+      player.stop();
+    }
+    await player.dispose();
+  }
+
+  Future<void> _onTimerFinish() async {
+    await player.setAsset("assets/audio/bells/bell-1.mp3");
+    await player.setLoopMode(LoopMode.off);
+    await player.play();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +76,7 @@ class HomeScreen extends StatelessWidget {
                   Positioned(
                     top: 0,
                     child: CircularTimer(
-                      onTimerEnd: () {
-                        // TODO
-                      },
+                      onFinish: _onTimerFinish,
                     ),
                   ),
                 ],
