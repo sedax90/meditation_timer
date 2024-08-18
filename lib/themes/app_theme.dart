@@ -7,7 +7,7 @@ class AppThemes {
     textTheme: const TextTheme(),
     scaffoldBackgroundColor: AppColors.lightGreen,
     bottomSheetTheme: BottomSheetThemeData(
-      backgroundColor: const Color.fromRGBO(244, 240, 231, 1),
+      backgroundColor: AppColors.sand,
       modalBarrierColor: AppColors.darkGreen.withOpacity(0.75),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -46,6 +46,7 @@ class AppColors {
   static const Color lightGreen = Color.fromRGBO(179, 241, 198, 1);
   static const Color green = Color.fromRGBO(70, 177, 105, 1);
   static const Color darkGreen = Color.fromRGBO(12, 29, 23, 1);
+  static const Color sand = Color.fromRGBO(244, 240, 231, 1);
 }
 
 class AppFonts {

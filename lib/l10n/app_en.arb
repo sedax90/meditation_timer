@@ -2,5 +2,6 @@
     "app_title": "Meditation timer",
     "generic_cancel": "Cancel",
     "generic_save": "Save",
-    "generic_set": "Set"
+    "generic_set": "Set",
+    "generic_confirm": "Confirm"
 }

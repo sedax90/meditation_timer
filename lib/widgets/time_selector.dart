@@ -67,7 +67,7 @@ class _TimeSelectorState extends State<TimeSelector> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.symmetric(vertical: 20),
+                margin: const EdgeInsets.only(top: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -85,24 +85,26 @@ class _TimeSelectorState extends State<TimeSelector> {
                           clipBehavior: Clip.none,
                           pageSnapping: true,
                           itemBuilder: (context, index) {
-                            final current = index == activePage;
+                            final isBefore = index < activePage;
+                            final isCurrent = index == activePage;
 
                             return AnimatedScale(
-                              scale: current ? 1 : 0.5,
+                              scale: isCurrent ? 1 : 0.5,
                               duration: const Duration(milliseconds: 200),
                               alignment: index < items.length
-                                  ? (index < activePage ? Alignment.centerRight : Alignment.centerLeft)
+                                  ? (isBefore ? Alignment.centerRight : Alignment.centerLeft)
                                   : Alignment.center,
                               child: AnimatedOpacity(
-                                opacity: current ? 1 : 0.65,
+                                opacity: isCurrent ? 1 : 0.65,
                                 duration: const Duration(milliseconds: 200),
                                 child: Text(
                                   items[index].toString(),
-                                  textAlign: TextAlign.center,
+                                  textAlign:
+                                      isCurrent ? TextAlign.center : (isBefore ? TextAlign.right : TextAlign.left),
                                   style: TextStyle(
                                     fontSize: 96,
                                     height: 1.0,
-                                    fontWeight: current ? FontWeight.normal : FontWeight.w100,
+                                    fontWeight: isCurrent ? FontWeight.normal : FontWeight.w100,
                                   ),
                                 ),
                               ),

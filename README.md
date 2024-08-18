@@ -1,16 +1,14 @@
 # meditation_timer
 
-A new Flutter project.
+A meditation timer written in Flutter.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## TODO:
+- [x] Timer with time selection
+- [x] Implement background sounds
+- [x] Implement background sounds speed
+- [ ] Implement save preset
+- [x] Implement bell sound on end
+- [ ] Implement change bell sound
+- [x] Implement vibration on end
+- [ ] Polish UI
+- [ ] Translations
