@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math' show pi;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_timer/screens/home_screen/widgets/circle_progress.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
@@ -31,14 +31,15 @@ class CircularTimer extends StatefulWidget {
 }
 
 class CircularTimerState extends State<CircularTimer> {
-  int _seconds = 5;
-  int _remainingSeconds = 5;
+  int _seconds = 60 * 5;
+  late int _remainingSeconds;
   Timer? _timer;
   bool _isActive = false;
 
   @override
   void initState() {
     super.initState();
+    _remainingSeconds = _seconds;
   }
 
   @override
@@ -195,7 +196,7 @@ class CircularTimerState extends State<CircularTimer> {
   }
 
   Widget _buildRunningTimerControls() {
-    final stopControl = GestureDetector(
+    final stopControl = Bounceable(
       onTap: _stopTimer,
       child: SvgPicture.asset(
         "assets/images/stop.svg",
@@ -209,7 +210,7 @@ class CircularTimerState extends State<CircularTimer> {
         children: [
           stopControl,
           const SizedBox(width: 25),
-          GestureDetector(
+          Bounceable(
             onTap: _pauseTimer,
             child: SvgPicture.asset(
               "assets/images/pause.svg",
@@ -224,7 +225,7 @@ class CircularTimerState extends State<CircularTimer> {
         children: [
           stopControl,
           const SizedBox(width: 25),
-          GestureDetector(
+          Bounceable(
             onTap: _startTimer,
             child: SvgPicture.asset(
               "assets/images/play.svg",
@@ -296,15 +297,16 @@ class CircularTimerState extends State<CircularTimer> {
                     style: TextStyle(
                       fontFamily: AppFonts.secondary,
                       color: AppColors.green,
+                      fontStyle: FontStyle.italic,
                       fontSize: 20,
                       height: 1.0,
                     ),
                   ),
-                  GestureDetector(
+                  Bounceable(
                     onTap: _openTimerSelection,
                     child: Text.rich(
                       TextSpan(
-                        style: const TextStyle(fontSize: 72, height: 1.0),
+                        style: const TextStyle(fontSize: 62, height: 1.0),
                         children: [
                           TextSpan(
                             text: TimerUtils.formatMinutes(_remainingSeconds),
@@ -332,7 +334,7 @@ class CircularTimerState extends State<CircularTimer> {
                     margin: const EdgeInsets.only(top: 20),
                     child: _timerIsRunning()
                         ? _buildRunningTimerControls()
-                        : GestureDetector(
+                        : Bounceable(
                             onTap: _startTimer,
                             child: SvgPicture.asset(
                               "assets/images/play.svg",

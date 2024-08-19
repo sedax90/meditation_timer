@@ -35,27 +35,27 @@ class BellSound {
 }
 
 class Preset {
-  final String title;
+  final String name;
   final int timeSec;
   final String backgroundSound;
   final double speed;
 
   Preset({
-    required this.title,
+    required this.name,
     required this.timeSec,
     required this.backgroundSound,
     required this.speed,
   });
 
   Preset.fromJson(Map<String, dynamic> json)
-      : title = json['title'],
+      : name = json['name'],
         timeSec = json['timeSec'],
         backgroundSound = json['backgroundSound'],
         speed = json['speed'];
 
   Map<String, dynamic> toJson() {
     return {
-      'title': title,
+      'name': name,
       'timeSec': timeSec,
       'backgroundSound': backgroundSound,
       'speed': speed,

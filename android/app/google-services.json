@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "918226755356",
+    "project_id": "meditation-timer-ed2b5",
+    "storage_bucket": "meditation-timer-ed2b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918226755356:android:f3261166c1c14dd4e4a4d9",
+        "android_client_info": {
+          "package_name": "com.csedax90.meditation_timer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxYRcHkA1CvsxZ5f2tbnYnzDeTyKtbynU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ class AppThemes {
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     fontFamily: AppFonts.primary,
+    colorSchemeSeed: AppColors.darkGreen,
     textTheme: const TextTheme(
       titleLarge: TextStyle(
         fontFamily: AppFonts.secondary,
@@ -68,6 +69,12 @@ class AppThemes {
         fontFamily: AppFonts.secondary,
         fontStyle: FontStyle.italic,
         fontSize: 20,
+      ),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      border: OutlineInputBorder(
+        borderSide: BorderSide(color: AppColors.darkGreen),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
       ),
     ),
   );

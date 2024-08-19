@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:meditation_timer/models.dart';
@@ -10,8 +11,10 @@ import 'package:meditation_timer/screens/presets_screen/presets.dart';
 import 'package:meditation_timer/services/settings_service.dart';
 import 'package:meditation_timer/services/user_preferences_service.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
+import 'package:meditation_timer/widgets/save_preset_form.dart';
 import 'package:meditation_timer/widgets/selection_slider.dart';
 import 'package:vibration/vibration.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -174,20 +177,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {});
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Using preset ${preset.title}")));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Using preset ${preset.name}")));
   }
 
   Future<void> _addPreset() async {
-    await UserPreferencesService.addPreset(Preset(
-      title: DateTime.now().toString(),
-      timeSec: _circulartTimerKey.currentState!.getTimeSec(),
-      backgroundSound: _selectedBackgroundSound.asset,
-      speed: _selectedSpeed.value,
-    ));
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Wrap(
+              children: [
+                SavePresetForm(
+                  onPresetNameSubmit: (name) async {
+                    Navigator.pop(context);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Preset saved!")));
-    }
+                    await UserPreferencesService.addPreset(Preset(
+                      name: name,
+                      timeSec: _circulartTimerKey.currentState!.getTimeSec(),
+                      backgroundSound: _selectedBackgroundSound.asset,
+                      speed: _selectedSpeed.value,
+                    ));
+
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Preset $name saved!")));
+                    }
+                  },
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -235,12 +256,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 AnimatedOpacity(
                                   duration: const Duration(milliseconds: 200),
                                   opacity: _timerActive ? 0.5 : 1.0,
-                                  child: GestureDetector(
+                                  child: Bounceable(
                                     onTap: _timerActive ? null : _openPresets,
                                     child: SvgPicture.asset("assets/images/presets.svg"),
                                   ),
                                 ),
-                                GestureDetector(
+                                Bounceable(
                                   onTap: _addPreset,
                                   child: SvgPicture.asset("assets/images/heart_empty.svg"),
                                 ),

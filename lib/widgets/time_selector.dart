@@ -115,10 +115,11 @@ class _TimeSelectorState extends State<TimeSelector> {
                         fontSize: 24,
                         fontFamily: AppFonts.secondary,
                         fontStyle: FontStyle.italic,
+                        height: 1.0,
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(top: 20),
+                      margin: const EdgeInsets.only(top: 40),
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         children: [

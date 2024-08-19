@@ -15,3 +15,4 @@ A meditation timer written in Flutter.
 - [x] Implement change vibrate on end
 - [ ] Polish UI
 - [ ] Translations
+- [ ] Add initial tutorial

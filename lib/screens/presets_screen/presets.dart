@@ -48,8 +48,8 @@ class _PresetsState extends State<Presets> {
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: _presets.isEmpty
                   ? Text("No presets")
-                  : Container(
-                      height: MediaQuery.of(context).size.height * 0.5,
+                  : ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5),
                       child: SingleChildScrollView(
                         child: Wrap(
                           children: _presets.map((e) {
@@ -64,7 +64,7 @@ class _PresetsState extends State<Presets> {
                                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                                   ),
                                   child: Text(
-                                    e.title,
+                                    e.name,
                                   ),
                                 ),
                               ),

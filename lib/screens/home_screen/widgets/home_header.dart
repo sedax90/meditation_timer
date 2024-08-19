@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
 import 'package:meditation_timer/screens/settings_screen/settings.dart';
@@ -44,7 +45,7 @@ class HomeHeader extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    GestureDetector(
+                    Bounceable(
                       onTap: () => _onSettingsTap(context),
                       child: SvgPicture.asset("assets/images/settings.svg"),
                     ),
