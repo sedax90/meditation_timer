@@ -4,7 +4,23 @@ class AppThemes {
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     fontFamily: AppFonts.primary,
-    textTheme: const TextTheme(),
+    textTheme: const TextTheme(
+      titleLarge: TextStyle(
+        fontFamily: AppFonts.secondary,
+        fontStyle: FontStyle.italic,
+        fontSize: 30,
+      ),
+      titleMedium: TextStyle(
+        fontFamily: AppFonts.secondary,
+        fontStyle: FontStyle.italic,
+        fontSize: 26,
+      ),
+      titleSmall: TextStyle(
+        fontFamily: AppFonts.secondary,
+        fontStyle: FontStyle.italic,
+        fontSize: 23,
+      ),
+    ),
     scaffoldBackgroundColor: AppColors.lightGreen,
     bottomSheetTheme: BottomSheetThemeData(
       backgroundColor: AppColors.sand,
@@ -37,6 +53,21 @@ class AppThemes {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
+      ),
+    ),
+    switchTheme: const SwitchThemeData(
+      thumbColor: WidgetStatePropertyAll(AppColors.darkGreen),
+      trackOutlineColor: WidgetStatePropertyAll(AppColors.darkGreen),
+      overlayColor: WidgetStatePropertyAll(AppColors.lightGreen),
+      trackColor: WidgetStatePropertyAll(Colors.transparent),
+    ),
+    snackBarTheme: const SnackBarThemeData(
+      backgroundColor: AppColors.sand,
+      contentTextStyle: TextStyle(
+        color: AppColors.darkGreen,
+        fontFamily: AppFonts.secondary,
+        fontStyle: FontStyle.italic,
+        fontSize: 20,
       ),
     ),
   );

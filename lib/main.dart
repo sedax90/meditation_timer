@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meditation_timer/screens/home_screen.dart';
+import 'package:meditation_timer/screens/home_screen/home_screen.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 

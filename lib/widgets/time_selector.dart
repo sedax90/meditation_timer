@@ -57,13 +57,11 @@ class _TimeSelectorState extends State<TimeSelector> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
                   "Set timer",
-                  style: TextStyle(
-                    fontSize: 24,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
               Container(

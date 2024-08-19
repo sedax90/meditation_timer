@@ -4,34 +4,36 @@ import 'package:meditation_timer/themes/app_theme.dart';
 class SelectionSlider<T> extends StatefulWidget {
   final String title;
   final List<T> items;
-  final T? selectedItem;
+  final T? defaultSelectedItem;
   final Function(T)? onItemSelect;
   final bool disabled;
   final bool lightTheme;
+  final double titlePadding;
 
   const SelectionSlider({
     super.key,
     required this.title,
     required this.items,
-    this.selectedItem,
+    this.defaultSelectedItem,
     this.onItemSelect,
     this.disabled = false,
     this.lightTheme = false,
+    this.titlePadding = 30,
   });
 
   @override
-  State<StatefulWidget> createState() => _SelectionSliderState<T>();
+  State<StatefulWidget> createState() => SelectionSliderState<T>();
 }
 
-class _SelectionSliderState<T> extends State<SelectionSlider<T>> {
+class SelectionSliderState<T> extends State<SelectionSlider<T>> {
   T? _selectedItem;
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.selectedItem != null) {
-      _selectedItem = widget.selectedItem;
+    if (widget.defaultSelectedItem != null) {
+      _selectedItem = widget.defaultSelectedItem;
     } else {
       _selectedItem = widget.items.isNotEmpty ? widget.items.first : null;
     }
@@ -47,7 +49,13 @@ class _SelectionSliderState<T> extends State<SelectionSlider<T>> {
     }
   }
 
-  Color getColor() {
+  void setSelectedItem(T item) {
+    setState(() {
+      _selectedItem = item;
+    });
+  }
+
+  Color _getColor() {
     return widget.lightTheme ? AppColors.darkGreen : AppColors.lightGreen;
   }
 
@@ -58,15 +66,10 @@ class _SelectionSliderState<T> extends State<SelectionSlider<T>> {
       children: [
         Container(
           margin: const EdgeInsets.only(bottom: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+          padding: EdgeInsets.symmetric(horizontal: widget.titlePadding),
           child: Text(
             widget.title,
-            style: TextStyle(
-              fontFamily: AppFonts.secondary,
-              fontStyle: FontStyle.italic,
-              color: getColor(),
-              fontSize: 30,
-            ),
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(color: _getColor()),
           ),
         ),
         AnimatedOpacity(
@@ -80,7 +83,7 @@ class _SelectionSliderState<T> extends State<SelectionSlider<T>> {
                 : ListView.builder(
                     itemCount: widget.items.length,
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    padding: EdgeInsets.symmetric(horizontal: widget.titlePadding),
                     physics:
                         widget.disabled ? const NeverScrollableScrollPhysics() : const AlwaysScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
@@ -97,7 +100,7 @@ class _SelectionSliderState<T> extends State<SelectionSlider<T>> {
                           margin: EdgeInsets.only(right: !isLast ? 12 : 0),
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            color: isSelected ? getColor() : getColor().withOpacity(0.5),
+                            color: isSelected ? _getColor() : _getColor().withOpacity(0.5),
                           ),
                           child: Text(
                             item.toString(),

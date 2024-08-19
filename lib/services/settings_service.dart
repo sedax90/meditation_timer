@@ -12,10 +12,11 @@ class SettingsService {
       BackgroundSound(title: "None", asset: ""),
       BackgroundSound(title: "Omh", asset: "assets/audio/backgrounds/ohm.mp3"),
       BackgroundSound(title: "So Ham", asset: "assets/audio/backgrounds/so-ham.mp3"),
-      BackgroundSound(title: "Heavy ran", asset: "assets/audio/backgrounds/heavy-rain-nature-sounds-8186.mp3"),
+      BackgroundSound(title: "Heavy rain", asset: "assets/audio/backgrounds/heavy-rain-nature-sounds-8186.mp3"),
       BackgroundSound(
           title: "Nature birds", asset: "assets/audio/backgrounds/nature-birds-ambiance-morning-kisses-214774.mp3"),
       BackgroundSound(title: "Dripping water", asset: "assets/audio/backgrounds/dripping-water-nature-sounds-8050.mp3"),
+      BackgroundSound(title: "Beach", asset: "assets/audio/backgrounds/soft-waves-on-the-beach-sound-190884.mp3"),
     ];
   }
 
