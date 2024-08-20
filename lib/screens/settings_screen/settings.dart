@@ -21,6 +21,7 @@ class _SettingsState extends State<Settings> {
   List<BellSound> _bellSounds = [];
   BellSound? _selectedBellSound;
   bool _vibrateOnEndSetting = false;
+  bool _reduceScreenBrightness = false;
   late AudioPlayer _player;
 
   @override
@@ -45,6 +46,7 @@ class _SettingsState extends State<Settings> {
     }
 
     _vibrateOnEndSetting = await UserPreferencesService.getVibrateOnEnd();
+    _reduceScreenBrightness = await UserPreferencesService.getReduceScreenBrightness();
 
     setState(() {
       _ready = true;
@@ -58,6 +60,7 @@ class _SettingsState extends State<Settings> {
   Future<void> _onSaveTap() async {
     await UserPreferencesService.setEndBellSound(_selectedBellSound != null ? _selectedBellSound!.asset : "");
     await UserPreferencesService.setVibrateOnEnd(_vibrateOnEndSetting);
+    await UserPreferencesService.setReduceScreenBrightness(_reduceScreenBrightness);
 
     if (mounted) {
       Navigator.pop(context);
@@ -81,6 +84,12 @@ class _SettingsState extends State<Settings> {
 
     _player.setAsset(value.asset);
     await _player.play();
+  }
+
+  Future<void> _onReduceBrightnessChange(final bool value) async {
+    setState(() {
+      _reduceScreenBrightness = value;
+    });
   }
 
   @override
@@ -132,6 +141,25 @@ class _SettingsState extends State<Settings> {
                             Switch(
                               value: _vibrateOnEndSetting,
                               onChanged: _onVibrateOnEndChange,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 20),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Low screen brightness (reduce battery usage)",
+                              style: Theme.of(context).textTheme.titleSmall!.copyWith(height: 1.0),
+                            ),
+                            Switch(
+                              value: _reduceScreenBrightness,
+                              onChanged: _onReduceBrightnessChange,
                             ),
                           ],
                         ),

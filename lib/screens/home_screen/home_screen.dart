@@ -13,8 +13,10 @@ import 'package:meditation_timer/services/user_preferences_service.dart';
 import 'package:meditation_timer/themes/app_theme.dart';
 import 'package:meditation_timer/widgets/save_preset_form.dart';
 import 'package:meditation_timer/widgets/selection_slider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,6 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<SelectionSliderState> _backgroundSoundSlider = GlobalKey();
   final GlobalKey<SelectionSliderState> _speedSlider = GlobalKey();
   final GlobalKey<CircularTimerState> _circulartTimerKey = GlobalKey();
+  Preset? _selectedPreset;
+  double _currentScreenBrightness = 1.0;
 
   @override
   initState() {
@@ -54,9 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
       player.stop();
     }
     await player.dispose();
+
+    if (await WakelockPlus.enabled) {
+      await WakelockPlus.disable();
+    }
   }
 
   Future<void> _onTimerStart() async {
+    await WakelockPlus.enable();
+    await _reduceScreenBrightness();
+
     setState(() {
       _timerActive = true;
     });
@@ -64,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_selectedBackgroundSound.asset.isNotEmpty) {
       await player.setAsset(_selectedBackgroundSound.asset);
       await player.setVolume(1.0);
-      await player.setLoopMode(LoopMode.off);
+      await player.setLoopMode(LoopMode.all);
       await player.play();
 
       await player.setSpeed(_selectedSpeed.value);
@@ -72,14 +83,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _onTimerPause() async {
+    await _restoreScreenBrightness();
     await player.pause();
   }
 
   Future<void> _onTimerResume() async {
+    await _reduceScreenBrightness();
     await player.play();
   }
 
   Future<void> _onTimerStop() async {
+    await WakelockPlus.disable();
+    await _restoreScreenBrightness();
     await player.stop();
 
     setState(() {
@@ -113,6 +128,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _timerActive = false;
     });
+
+    await _restoreScreenBrightness();
   }
 
   Future<void> fadeOutAndStop(final double startVolume) async {
@@ -137,14 +154,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return completer.future;
   }
 
+  Future<void> _reduceScreenBrightness() async {
+    final reduceBrightness = await UserPreferencesService.getReduceScreenBrightness();
+    if (reduceBrightness) {
+      _currentScreenBrightness = await ScreenBrightness().system;
+      await ScreenBrightness().setScreenBrightness(0.015);
+      setState(() {});
+    }
+  }
+
+  Future<void> _restoreScreenBrightness() async {
+    final reduceBrightness = await UserPreferencesService.getReduceScreenBrightness();
+    if (reduceBrightness) {
+      await ScreenBrightness().setScreenBrightness(_currentScreenBrightness);
+      await ScreenBrightness().resetScreenBrightness();
+    }
+  }
+
   void _onBackgroundSelect(final BackgroundSound sound) {
     setState(() {
+      _selectedPreset = null;
       _selectedBackgroundSound = sound;
     });
   }
 
   void _onSpeedSelect(final Speed speed) {
     setState(() {
+      _selectedPreset = null;
       _selectedSpeed = speed;
     });
   }
@@ -175,7 +211,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _speedSlider.currentState!.setSelectedItem(_selectedSpeed);
     _circulartTimerKey.currentState!.setTime(preset.timeSec);
 
-    setState(() {});
+    setState(() {
+      _selectedPreset = preset;
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Using preset ${preset.name}")));
   }
@@ -209,6 +247,90 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         });
+  }
+
+  void _removePreset(final Preset preset) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Wrap(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(AppLocalizations.of(context)!.generic_cancel),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () async {
+                          await UserPreferencesService.removePreset(preset);
+                          setState(() {
+                            _selectedPreset = null;
+                          });
+                          if (mounted) {
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(AppLocalizations.of(context)!.generic_confirm),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _getPresetBtn() {
+    if (_selectedPreset != null) {
+      return ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 70),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Bounceable(
+              onTap: () => _removePreset(_selectedPreset!),
+              child: SvgPicture.asset("assets/images/heart_full.svg"),
+            ),
+            Text(
+              _selectedPreset!.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: AppFonts.secondary,
+                fontStyle: FontStyle.italic,
+                color: AppColors.lightGreen,
+              ),
+            ),
+          ],
+        ),
+      );
+    } else {
+      return Bounceable(
+        onTap: _addPreset,
+        child: SvgPicture.asset("assets/images/heart_empty.svg"),
+      );
+    }
   }
 
   @override
@@ -252,6 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 30),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 AnimatedOpacity(
                                   duration: const Duration(milliseconds: 200),
@@ -261,10 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: SvgPicture.asset("assets/images/presets.svg"),
                                   ),
                                 ),
-                                Bounceable(
-                                  onTap: _addPreset,
-                                  child: SvgPicture.asset("assets/images/heart_empty.svg"),
-                                ),
+                                _getPresetBtn(),
                               ],
                             ),
                           ),

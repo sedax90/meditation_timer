@@ -13,6 +13,7 @@ class UserPreferencesService {
   static const END_BELL_SOUND = "END_BELL_SOUND";
   static const VIBRATE_ON_END = "VIBRATE_ON_END";
   static const PRESETS = "PRESETS";
+  static const REDUCE_SCREEN_BRIGHTNESS = "REDUCE_SCREEN_BRIGHTNESS";
 
   static Future<void> setEndBellSound(final String value) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -34,13 +35,23 @@ class UserPreferencesService {
     return prefs.getBool(VIBRATE_ON_END) ?? false;
   }
 
+  static Future<void> setReduceScreenBrightness(final bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(REDUCE_SCREEN_BRIGHTNESS, value);
+  }
+
+  static Future<bool> getReduceScreenBrightness() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(REDUCE_SCREEN_BRIGHTNESS) ?? false;
+  }
+
   static Future<void> addPreset(final Preset value) async {
     final currentPresetsEncoded = await getPresets();
 
     int? toRemove;
     for (int i = 0; i < currentPresetsEncoded.length; i++) {
       final item = currentPresetsEncoded[i];
-      if (item.backgroundSound == value.backgroundSound && item.speed == value.speed && item.timeSec == value.timeSec) {
+      if (item.name == value.name) {
         toRemove = i;
       }
     }
@@ -57,6 +68,15 @@ class UserPreferencesService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final List<String> encoded = presets.map((e) => json.encode(e)).toList();
     await prefs.setStringList(PRESETS, encoded);
+  }
+
+  static Future<void> removePreset(final Preset preset) async {
+    final presets = await getPresets();
+    final index = presets.indexWhere((e) => e.name == preset.name);
+    if (index >= 0) {
+      presets.removeAt(index);
+      await setPresets(presets);
+    }
   }
 
   static Future<List<Preset>> getPresets() async {

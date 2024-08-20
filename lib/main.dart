@@ -5,7 +5,11 @@ import 'package:meditation_timer/themes/app_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 void main() {
-  runApp(const App());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then((_) {
+    runApp(const App());
+  });
 }
 
 class App extends StatefulWidget {
