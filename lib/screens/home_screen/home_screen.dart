@@ -171,11 +171,22 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _onBackgroundSelect(final BackgroundSound sound) {
+  Future<void> _onBackgroundSelect(final BackgroundSound sound) async {
     setState(() {
       _selectedPreset = null;
       _selectedBackgroundSound = sound;
     });
+
+    if (sound.asset.isNotEmpty) {
+      await player.setAsset(sound.asset);
+      await player.setVolume(1.0);
+      await player.setLoopMode(LoopMode.off);
+      await player.setSpeed(_selectedSpeed.value);
+      await player.play();
+      Timer(const Duration(seconds: 3), () async {
+        await fadeOutAndStop(player.volume);
+      });
+    }
   }
 
   void _onSpeedSelect(final Speed speed) {
@@ -338,19 +349,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(bottom: 30),
-              child: const HomeHeader(),
-            ),
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 30),
+                child: const HomeHeader(),
+              ),
+              Stack(
+                alignment: Alignment.topCenter,
                 children: [
                   Transform.translate(
                     offset: Offset(0, MediaQuery.of(context).size.width * 0.45),
                     child: Container(
+                      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 20),
                       decoration: const BoxDecoration(
                         color: AppColors.green,
                         borderRadius: BorderRadius.only(
@@ -367,47 +379,50 @@ class _HomeScreenState extends State<HomeScreen> {
                           end: Alignment.bottomRight,
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            height: 100,
-                            padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 200),
-                                  opacity: _timerActive ? 0.5 : 1.0,
-                                  child: Bounceable(
-                                    onTap: _timerActive ? null : _openPresets,
-                                    child: SvgPicture.asset("assets/images/presets.svg"),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height * 0.7),
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 100,
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  AnimatedOpacity(
+                                    duration: const Duration(milliseconds: 200),
+                                    opacity: _timerActive ? 0.5 : 1.0,
+                                    child: Bounceable(
+                                      onTap: _timerActive ? null : _openPresets,
+                                      child: SvgPicture.asset("assets/images/presets.svg"),
+                                    ),
                                   ),
-                                ),
-                                _getPresetBtn(),
-                              ],
+                                  _getPresetBtn(),
+                                ],
+                              ),
                             ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child: SelectionSlider<BackgroundSound>(
-                              key: _backgroundSoundSlider,
-                              title: "Background sound",
-                              items: _backgroundSounds,
-                              defaultSelectedItem: _selectedBackgroundSound,
-                              onItemSelect: _onBackgroundSelect,
-                              disabled: _timerActive,
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 20),
+                              child: SelectionSlider<BackgroundSound>(
+                                key: _backgroundSoundSlider,
+                                title: "Background sound",
+                                items: _backgroundSounds,
+                                defaultSelectedItem: _selectedBackgroundSound,
+                                onItemSelect: _onBackgroundSelect,
+                                disabled: _timerActive,
+                              ),
                             ),
-                          ),
-                          SelectionSlider<Speed>(
-                            key: _speedSlider,
-                            title: "Speed",
-                            items: _speeds,
-                            defaultSelectedItem: _selectedSpeed,
-                            onItemSelect: _onSpeedSelect,
-                            disabled: _timerActive || _selectedBackgroundSound.asset.isEmpty,
-                          ),
-                        ],
+                            SelectionSlider<Speed>(
+                              key: _speedSlider,
+                              title: "Speed",
+                              items: _speeds,
+                              defaultSelectedItem: _selectedSpeed,
+                              onItemSelect: _onSpeedSelect,
+                              disabled: _timerActive || _selectedBackgroundSound.asset.isEmpty,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -424,8 +439,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
